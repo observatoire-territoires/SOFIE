@@ -1,0 +1,293 @@
+/* GENERAL */
+@import url('https://fonts.googleapis.com/css?family=Ubuntu');
+
+body{
+	background-color : #F9F9F9 ;
+}
+
+h2{
+	margin-top : 155px ;
+	font-family : 'Bree Serif' ;
+	font-size : 1.5em ;
+	font-weight : bold ;
+	color : #6e2150 ;
+}
+
+h3{	margin-top : 55px ;
+	font-family : 'Ubuntu', sans-serif;
+	font-size : 1.5em ;
+	font-weight : bold ;
+	color : "black" ;
+}
+
+h4{
+	font-family : 'Ubuntu', sans-serif;
+	font-size : 1.3em ; 
+	font-weight : bold ; 
+	color : #bd9aaf ;
+}
+
+a:hover{
+	text-decoration : none ;
+}
+
+/* HOME*/
+#bodyhome{
+	position : absolute ;
+	float : left ;
+	width : 97vw ;
+	min-height : 100vh ;
+	height : 100% ;
+	background-color : #6e2150 ;
+	z-index : -1 ;
+}
+
+#txtintro{
+	margin-top : 135px;
+	padding-left : 75px ;
+	padding-right : 75px ;
+	padding-bottom : 50px ;
+	color : white ;
+	font-family : 'Ubuntu', sans-serif;
+	text-align: left;
+}
+
+#ttintro1{
+	margin-top : 105px ;
+}
+
+.ttintro{
+	font-family : 'Bree Serif' ;
+	font-size : 1.5em ;
+	font-weight : bold ;
+	color : white ;
+}
+
+.selectize-input, .option{
+	text-align : left ;
+}
+
+#mapI.leaflet-container{
+	margin-top : 105px ;
+	background-color : rgba(0,0,0,0);
+	height : calc(105vh - 270px) !important;
+	width : 100% ;
+}
+
+button#go{
+	background-color : #ff715b ;
+	bottom : 0 ;
+	margin-top : 20px ;
+	border : 1px solid #ff715b ;
+	color :  #ffd8d2 ;
+	border-radius : 0 ;
+	float : right ;
+	font-size : 1.5em ; 
+	font-style : bold ;
+}
+
+/* BANDEAU TITRE */
+#titleband{
+	height : 150px ;
+	background-color : #6e2150 ;
+	background:linear-gradient(to bottom right,#6e2150 50%,rgba(255,0,0,0) 50%);
+	padding-top : 0px ;
+	position : absolute ;
+}
+
+h1{
+	font-family : 'Bree Serif';
+	color : #f1eaef ;
+	letter-spacing: 5px;
+}
+
+#sub{
+	font-family : 'Ubuntu', sans-serif;
+	color : #caaebf ;
+	line-height : 0.9em ;
+	font-weight : bold ;
+}
+
+/* STYLE DES ONGLETS */
+.row .col-sm-1.well{
+	margin-top : 100px ;
+	background-color : rgba(255, 255, 255, 0) ;
+	border : 0px ;
+	border-radius : 0px ;
+	padding : 0px;
+	width:50px;
+	height:200px;
+}
+
+.row ul li a{
+	background-color: rgba(255, 255, 255, 0);
+	border-radius: 0;
+	border : 0 ;
+	font-weight: bold;
+	font-size : 1.3em;
+}
+
+.row ul li.active a{
+	background-color: rgba(255, 255, 255, 0);
+	border-radius: 0;
+	font-weight: bold;
+	font-size : 1.3em;
+	color : #6e2150 ;
+}
+
+.row ul li a:hover, .row ul li.active a:focus{
+	background-color: rgba(255, 255, 255, 0) ;
+}
+
+.row ul li a:hover, .row ul li.active a:hover{
+	background-color: rgba(255, 255, 255, 0) ;
+}
+
+ .glyphicon.glyphicon-home{
+	color : #caaebf ;
+}
+
+  .glyphicon.glyphicon-dashboard, .glyphicon.glyphicon-eye-open, .glyphicon.glyphicon-book, .glyphicon.glyphicon-question-sign{
+	color : #6e2150 ;
+}
+
+/* CARTE */
+#map.leaflet-container{
+	background-color : rgba(0,0,0,0);
+	height : calc(100vh - 270px) !important;
+	width : 100% ;
+}
+
+.leaflet-control-zoom.leaflet-bar.leaflet-control{
+	float : right ;
+	text-align : right ;
+}
+
+.leaflet-left{ /* DIRTY DIRTY  */
+	right : 10px ;
+}
+
+.leaflet-tooltip-top::before{
+    display : none ;
+}
+
+#recherche, #rechercheI{
+	z-index : 100 ;
+}
+
+/* GRAPHIQUES */
+#graph1, #graph2{
+	margin-top : 190px ;
+	height : calc(50vh - 100px) !important;
+}
+
+.material-switch{
+	position : absolute ;
+	margin-top : 100px ;
+	right : 10px ;
+	font-family : 'Ubuntu', sans-serif ;
+}
+
+.switch-material .label.label-default{
+	background-color: red;
+}
+
+
+#fdf1{
+	background-color : #63a375;
+	color : white ;
+	font-family : 'Ubuntu', sans-serif ;
+}
+
+#fdf2{
+	background-color : #a64253;
+	color : white ;
+	font-family : 'Ubuntu', sans-serif ;
+}
+
+.nb{
+	font-family : 'Ubuntu', sans-serif ;
+	font-size : 0.8em ;
+	color : #93827f ;
+	font-style : italic ;
+}
+
+/****************************/
+/* Mise en forme des volets */
+/****************************/
+
+.ttv{
+	font-family : 'Bree Serif' ;
+	color : #b6b6b6 ;
+	font-weight : bold ;
+	font-size : 2em ;
+	text-align : right ;
+}
+
+.v2{
+	margin-top : 5vh ;
+	margin-bottom : 10vh ;
+	height : 85vh ;
+	z-index : -1 ;
+	background: repeating-linear-gradient(
+	  -45deg,
+	  #ececec,
+	  #ececec 1px,
+	  #F9F9F9 1px,
+	  #F9F9F9 5px
+	);
+}
+
+.v2txt{
+	font-size : 1em ;
+	background-color : #F9F9F9 ;
+	margin-top : 5vh ;
+	text-align : justify ;
+	color : #333232;
+	font-family : 'Ubuntu', sans-serif ;
+}
+
+.tttxt{
+	color : #333232 ; 
+	font-size : 1.5em ;
+	text-align : left ;
+}
+
+.panarr{
+	width : 100px ;
+	left : 44.2vw ;
+	margin-top : 95vh ;
+	z-index : 100 ;
+}
+
+.arrow{
+  width: 0; 
+  height: 0; 
+  border-left: 20px solid transparent;
+  border-right: 20px solid transparent;
+  border-top: 20px solid #333232;
+}
+
+#dir{
+	width : auto ;
+	bottom : 5vh ;
+	right : 0 ; 
+	position : absolute ;
+	z-index : 100 ;
+}
+
+#dir1, #dir2{
+	float : left ;
+	width : auto ;
+	background-color : #6e2150 ;
+	padding : 5px ;
+	font-size : 1.2em ;
+	color : #f1eaef ;
+	font-family : 'Ubuntu', sans-serif;
+	border-radius : 3px ;
+	border : 1px solid #6e2150 ;
+}
+
+#dir1{
+	margin-right : 10px ;
+}

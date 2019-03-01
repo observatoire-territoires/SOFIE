@@ -1,0 +1,12 @@
+name: SOFIE
+title: SOFIE
+username:
+account: observatoiredesterritoirescl
+server: shinyapps.io
+hostUrl: https://api.shinyapps.io/v1
+appId: 748523
+bundleId: 1906770
+url: https://observatoiredesterritoirescl.shinyapps.io/SOFIE/
+when: 1551375592.78159
+asMultiple: FALSE
+asStatic: FALSE
