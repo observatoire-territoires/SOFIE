@@ -69,7 +69,16 @@ data_gr2 <- dataFL_b100 %>%
   left_join(select(meta, ID, Indicateur, Unite, Indicateur_s), by = c("Indic" = "ID"))
 
 # Correspondance commune epci
+### FIXME : Test en ajoutant un EPCI contenant une apostrophe : marche bien pour moi
+### FIXME : ne pas oublier de supprimer le add_row() après avoir réintegré les apostrophes
 comepci <- read_xlsx("data/tabcomepci.xlsx") %>%
+  add_row(com2018 = "01000",
+          libcom = "Test d'apostrophe",
+          epci2018 = 20000001,
+          libepci = "Test d'apostrophe 2",
+          dep = "01",
+          libdep = "Ain",
+          .before = 1) %>%
   mutate(IDlgcom = paste0(com2018, " - ", libcom)) %>%
   mutate(IDlgepci = paste0(epci2018, " - ", libepci)) %>%
   mutate(IDlgdep = paste0(dep, " - ", libdep)) %>%
