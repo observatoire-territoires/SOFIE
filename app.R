@@ -272,6 +272,8 @@ for (column in colnames(cap@data)) {
       return(react1)
     })
     
+    curr_dep <- reactiveVal(value = 0)
+    
     
     ## REACTIVE FUNCTIONS ##
     # Menu de recherche d'EPCI par nom INTRO
@@ -281,6 +283,15 @@ for (column in colnames(cap@data)) {
     #               choices = c("Votre EPCI" = "", unique(comepci$IDlgepci[comepci$IDlgdep == input$chxdep1])),
     #               multiple = FALSE)
     # })
+    
+    observeEvent(input$chxdep1, {
+      if (curr_dep() != input$chxdep1){
+        curr_dep(input$chxdep1)
+        updateSelectInput(session = session, inputId = "chx1", label = NULL,
+                          choices = c("Votre EPCI" = "", unique(comepci$IDlgepci[comepci$IDlgdep == curr_dep()])))
+      }
+    }
+    )
     
     # Menu de recherche d'EPCI par nom
     # output$inputcom <- renderUI({
@@ -460,7 +471,11 @@ for (column in colnames(cap@data)) {
         res <- p$id
         res <- unique(comepci$IDlgepci[comepci$epci2018 == res])
         res <- res[!is.na(res)]
-      
+        curr_dep(dep)
+       
+        updateSelectInput(session, "chx1",
+                          choices = c("Votre EPCI" = "", unique(comepci$IDlgepci[comepci$IDlgdep == curr_dep()])), selected = res)
+        
         updateSelectInput(session, "chx2", choices = c("Votre EPCI" = "", unique(comepci$IDlgepci)), selected = res)
         
       }
