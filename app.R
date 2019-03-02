@@ -150,7 +150,10 @@ for (column in colnames(cap@data)) {
                                                         label = NULL,
                                                         choices = c("Votre département" = "", unique(comepci$IDlgdep)),
                                                         multiple = FALSE),
-                                            uiOutput("chxepci1")
+                                            #uiOutput("chxepci1")
+                                            selectInput("chx1", label = NULL,
+                                                        choices = c("Votre EPCI" = "", unique(comepci$IDlgepci)),
+                                                        multiple = FALSE)
                                             ),
                                      column(6,
                                             withSpinner(leafletOutput("mapI"), color = "#ff8a78", type = 7),
@@ -164,7 +167,13 @@ for (column in colnames(cap@data)) {
                                                  tags$a(div(class = "arrow"), href="#row2")),
                                    h2("L'accès à l'emploi des femmes\ndans les EPCI français"),
                                    absolutePanel(id = "recherche", top = 200, left = 25,
-                                                 uiOutput("inputcom")),
+                                                 selectInput("chx2",
+                                                             label = NULL,
+                                                             choices = c("Votre EPCI" = "", unique(comepci$IDlgepci)),
+                                                             multiple = FALSE,
+                                                             selectize = T)
+                                                 #uiOutput("inputcom")
+                                                 ),
                                    withSpinner(leafletOutput("map"), color = "#ff8a78", type = 7)),
                             column(6, class = "v2",
                                    uiOutput("disp_libepci"),
@@ -266,22 +275,22 @@ for (column in colnames(cap@data)) {
     
     ## REACTIVE FUNCTIONS ##
     # Menu de recherche d'EPCI par nom INTRO
-    output$chxepci1 <- renderUI({
-      selectInput("chx1",
-                  label = NULL,
-                  choices = c("Votre EPCI" = "", unique(comepci$IDlgepci[comepci$IDlgdep == input$chxdep1])),
-                  multiple = FALSE)
-    })
+    # output$chxepci1 <- renderUI({
+    #   selectInput("chx1",
+    #               label = NULL,
+    #               choices = c("Votre EPCI" = "", unique(comepci$IDlgepci[comepci$IDlgdep == input$chxdep1])),
+    #               multiple = FALSE)
+    # })
     
     # Menu de recherche d'EPCI par nom
-    output$inputcom <- renderUI({
-      selectInput("chx2",
-                  label = NULL,
-                  choices = c("Votre EPCI" = "", unique(comepci$IDlgepci)),
-                  multiple = FALSE, 
-                  selected = input$chx1,
-                  selectize = T)
-    })
+    # output$inputcom <- renderUI({
+    #   selectInput("chx2",
+    #               label = NULL,
+    #               choices = c("Votre EPCI" = "", unique(comepci$IDlgepci)),
+    #               multiple = FALSE, 
+    #               selected = input$chx1,
+    #               selectize = T)
+    # })
     
     # Affichage du nom de l'EPCI
     output$disp_libepci <- renderUI({
