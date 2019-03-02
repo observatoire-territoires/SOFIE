@@ -538,6 +538,7 @@ for (column in colnames(cap@data)) {
       p <-  input$map_shape_click
       if(!is.null(p$id)){
         updateSelectInput(session, "chx1", choices =c("Votre EPCI" = "", unique(comepci$IDlgepci)), selected = comepci$IDlgepci[comepci$epci2018 == p$id])
+        updateSelectInput(session, "chx2", choices =c("Votre EPCI" = "", unique(comepci$IDlgepci)), selected = comepci$IDlgepci[comepci$epci2018 == p$id])
       }
     })
     
