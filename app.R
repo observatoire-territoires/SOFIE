@@ -461,8 +461,7 @@ for (column in colnames(cap@data)) {
         res <- unique(comepci$IDlgepci[comepci$epci2018 == res])
         res <- res[!is.na(res)]
       
-        updateSelectInput(session, "chx1", selected = res)
-        updateSelectInput(session, "chx2", selected = res)
+        updateSelectInput(session, "chx2", choices = c("Votre EPCI" = "", unique(comepci$IDlgepci)), selected = res)
         
       }
     })
@@ -538,7 +537,7 @@ for (column in colnames(cap@data)) {
     observeEvent(input$map_shape_click, {
       p <-  input$map_shape_click
       if(!is.null(p$id)){
-        updateSelectInput(session, "chx1", selected = comepci$IDlgepci[comepci$epci2018 == p$id])
+        updateSelectInput(session, "chx1", choices =c("Votre EPCI" = "", unique(comepci$IDlgepci)), selected = comepci$IDlgepci[comepci$epci2018 == p$id])
       }
     })
     
