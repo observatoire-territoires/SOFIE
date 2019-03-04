@@ -69,7 +69,16 @@ data_gr2 <- dataFL_b100 %>%
   left_join(select(meta, ID, Indicateur, Unite, Indicateur_s), by = c("Indic" = "ID"))
 
 # Correspondance commune epci
+### FIXME : Test en ajoutant un EPCI contenant une apostrophe : marche bien pour moi
+### FIXME : ne pas oublier de supprimer le add_row() après avoir réintegré les apostrophes
 comepci <- read_xlsx("data/tabcomepci.xlsx") %>%
+  add_row(com2018 = "01000",
+          libcom = "Test d'apostrophe",
+          epci2018 = 20000001,
+          libepci = "Test d'apostrophe 2",
+          dep = "01",
+          libdep = "Ain",
+          .before = 1) %>%
   mutate(IDlgcom = paste0(com2018, " - ", libcom)) %>%
   mutate(IDlgepci = paste0(epci2018, " - ", libepci)) %>%
   mutate(IDlgdep = paste0(dep, " - ", libdep)) %>%
@@ -141,7 +150,10 @@ for (column in colnames(cap@data)) {
                                                         label = NULL,
                                                         choices = c("Votre département" = "", unique(comepci$IDlgdep)),
                                                         multiple = FALSE),
-                                            uiOutput("chxepci1")
+                                            #uiOutput("chxepci1")
+                                            selectInput("chx1", label = NULL,
+                                                        choices = c("Votre EPCI" = "", unique(comepci$IDlgepci)),
+                                                        multiple = FALSE)
                                             ),
                                      column(6,
                                             withSpinner(leafletOutput("mapI"), color = "#ff8a78", type = 7),
@@ -155,7 +167,13 @@ for (column in colnames(cap@data)) {
                                                  tags$a(div(class = "arrow"), href="#row2")),
                                    h2("L'accès à l'emploi des femmes\ndans les EPCI français"),
                                    absolutePanel(id = "recherche", top = 200, left = 25,
-                                                 uiOutput("inputcom")),
+                                                 selectInput("chx2",
+                                                             label = NULL,
+                                                             choices = c("Votre EPCI" = "", unique(comepci$IDlgepci)),
+                                                             multiple = FALSE,
+                                                             selectize = T)
+                                                 #uiOutput("inputcom")
+                                                 ),
                                    withSpinner(leafletOutput("map"), color = "#ff8a78", type = 7)),
                             column(6, class = "v2",
                                    uiOutput("disp_libepci"),
@@ -254,25 +272,36 @@ for (column in colnames(cap@data)) {
       return(react1)
     })
     
+    curr_dep <- reactiveVal(value = 0)
+    
     
     ## REACTIVE FUNCTIONS ##
     # Menu de recherche d'EPCI par nom INTRO
-    output$chxepci1 <- renderUI({
-      selectInput("chx1",
-                  label = NULL,
-                  choices = c("Votre EPCI" = "", unique(comepci$IDlgepci[comepci$IDlgdep == input$chxdep1])),
-                  multiple = FALSE)
-    })
+    # output$chxepci1 <- renderUI({
+    #   selectInput("chx1",
+    #               label = NULL,
+    #               choices = c("Votre EPCI" = "", unique(comepci$IDlgepci[comepci$IDlgdep == input$chxdep1])),
+    #               multiple = FALSE)
+    # })
+    
+    observeEvent(input$chxdep1, {
+      if (curr_dep() != input$chxdep1){
+        curr_dep(input$chxdep1)
+        updateSelectInput(session = session, inputId = "chx1", label = NULL,
+                          choices = c("Votre EPCI" = "", unique(comepci$IDlgepci[comepci$IDlgdep == curr_dep()])))
+      }
+    }
+    )
     
     # Menu de recherche d'EPCI par nom
-    output$inputcom <- renderUI({
-      selectInput("chx2",
-                  label = NULL,
-                  choices = c("Votre EPCI" = "", unique(comepci$IDlgepci)),
-                  multiple = FALSE, 
-                  selected = input$chx1,
-                  selectize = T)
-    })
+    # output$inputcom <- renderUI({
+    #   selectInput("chx2",
+    #               label = NULL,
+    #               choices = c("Votre EPCI" = "", unique(comepci$IDlgepci)),
+    #               multiple = FALSE, 
+    #               selected = input$chx1,
+    #               selectize = T)
+    # })
     
     # Affichage du nom de l'EPCI
     output$disp_libepci <- renderUI({
@@ -442,9 +471,12 @@ for (column in colnames(cap@data)) {
         res <- p$id
         res <- unique(comepci$IDlgepci[comepci$epci2018 == res])
         res <- res[!is.na(res)]
-      
-        updateSelectInput(session, "chx1", selected = res)
-        updateSelectInput(session, "chx2", selected = res)
+        curr_dep(dep)
+       
+        updateSelectInput(session, "chx1",
+                          choices = c("Votre EPCI" = "", unique(comepci$IDlgepci[comepci$IDlgdep == curr_dep()])), selected = res)
+        
+        updateSelectInput(session, "chx2", choices = c("Votre EPCI" = "", unique(comepci$IDlgepci)), selected = res)
         
       }
     })
@@ -520,7 +552,8 @@ for (column in colnames(cap@data)) {
     observeEvent(input$map_shape_click, {
       p <-  input$map_shape_click
       if(!is.null(p$id)){
-        updateSelectInput(session, "chx1", selected = comepci$IDlgepci[comepci$epci2018 == p$id])
+        updateSelectInput(session, "chx1", choices =c("Votre EPCI" = "", unique(comepci$IDlgepci)), selected = comepci$IDlgepci[comepci$epci2018 == p$id])
+        updateSelectInput(session, "chx2", choices =c("Votre EPCI" = "", unique(comepci$IDlgepci)), selected = comepci$IDlgepci[comepci$epci2018 == p$id])
       }
     })
     
