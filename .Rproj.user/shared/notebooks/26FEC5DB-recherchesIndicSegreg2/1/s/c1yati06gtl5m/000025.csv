@@ -1,0 +1,15 @@
+"0","           legend.values.rnd = 1)
+choroLayer(x = df_carto,
+           var = ""sh_MNM"",
+           nclass = 5,
+           method = ""quantile"",
+           col = c(""#ece7d9"", ""#c7c2c9"", ""#a39fb8"", ""#817ca7"", ""#5e5b99""),
+           border = NA,
+           colNA = ""grey60"",
+           legend.pos = ""right"",
+           legend.title.txt = ""Part des élèves\nde niveau 1ere\ninscrits dans des\nformations non mixtes\n(en % en 2015)"",
+           legend.values.rnd = 1)
+"
+"2","Error in classInt::classIntervals(v, nclass, style = method) : 
+  var is not numeric
+"

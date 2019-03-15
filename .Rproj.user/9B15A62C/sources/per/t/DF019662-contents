@@ -1,0 +1,473 @@
+## Mise en forme et agrégation des données de l'applicatio de diagnostic de la situation des femmes face à l'emploi
+# CL, OT, janvier 2019
+
+rm(list = ls())
+
+library(dplyr)
+library(readxl)
+library(COGugaison)
+library(data.table)
+library(tidyr)
+library(janitor)
+library(foreign)
+
+# Chargement des données
+men <- read_xlsx("N:/Transverse/Donnees_Obs/Donnees_Statistiques/Insee/RP/RP2015/Bases chiffres clés/base-cc-coupl-fam-men-2015.xlsx", sheet = "COM_2015", skip = 5)
+#act1 <- read_xlsx("N:/Transverse/Donnees_Obs/Donnees_Statistiques/Insee/RP/RP2015/Bases chiffres clés/base-cc-emploi-pop-active-2015.xlsx", sheet = "COM_2015", skip = 5)
+pop5 <- read_xlsx("N:/Transverse/Donnees_Obs/Donnees_Statistiques/Insee/RP/RP2015/Bases tableaux détaillés/XLS/BTX_TD_POP5_2015.xlsx", sheet = "COM", skip = 10)
+formations <- read_xlsx("data/mefstat.xlsx", sheet = "mef_stat_7") # Sur 62 formations de 1ère, seules 19 ont des élèves dans la base
+eleves1ere <- fread("data/eleves1ere.csv")
+lycees <- read_xlsx("N:/Transverse/Donnees_Obs/Donnees_Statistiques/DEPP/Données établissements/BCE_2015/CGET2015.xlsx")
+form <- read_xlsx("N:/Transverse/Donnees_Obs/Donnees_Statistiques/Insee/RP/RP2015/Bases tableaux détaillés/XLS/BTX_TD_FOR2_2015.xlsx", sheet = "COM", skip = 10)
+act2 <- read_xlsx("N:/Transverse/Donnees_Obs/Donnees_Statistiques/Insee/RP/RP2015/Bases tableaux détaillés/XLS/BTX_TD_POP5_2015.xlsx", sheet = "COM", skip = 10)
+empcsp1 <- read_xlsx("N:/Transverse/Donnees_Obs/Donnees_Statistiques/Insee/RP/RP2015/Bases tableaux détaillés/XLS/BTX_TD_EMP3_2015.xlsx", sheet = "COM1", skip = 10)
+empcsp2 <- read_xlsx("N:/Transverse/Donnees_Obs/Donnees_Statistiques/Insee/RP/RP2015/Bases tableaux détaillés/XLS/BTX_TD_EMP3_2015.xlsx", sheet = "COM2", skip = 10)
+libcsp <- read_xlsx("N:/Transverse/Donnees_Obs/Donnees_Statistiques/Insee/RP/RP2015/Bases tableaux détaillés/XLS/BTX_TD_EMP3_2015.xlsx", sheet = "Liste des variables", range = "A12:A41") %>%
+  setNames(c("Col")) %>%
+  mutate(CODE = substr(Col, 1, 2)) %>%
+  mutate(LIB = substr(Col, 6, nchar(.))) %>%
+  select(-Col)
+chom <- read_xlsx("N:/Transverse/Donnees_Obs/Donnees_Statistiques/Insee/RP/RP2015/Bases tableaux détaillés/XLS/BTX_TD_ACT1_2015.xlsx", sheet = "COM", skip = 10)
+empcond <- read_xlsx("N:/Transverse/Donnees_Obs/Donnees_Statistiques/Insee/RP/RP2015/Bases tableaux détaillés/XLS/BTX_TD_EMP4_2015.xlsx", sheet = "COM", skip = 10)
+# domsco <- read_xlsx("data/domsco 11022019.xlsx") %>%
+#   filter(mediane != 9999)
+# domsco$epci[is.na(domsco$epci)] <- "Total"
+sco <- read.dbf("data/donneesindiv.dbf", as.is = F)
+domtrav <- read_xlsx("data/domtrav_fem 11022019.xlsx")
+domtrav$epci[is.na(domtrav$epci)] <- "Total"
+# accequ <- read_xlsx("N:/DST/SDOAS/BOT/Espace de travail/Données statistiques/INSEE/INSEE__fourniture_données/2018/Indicateurs_qualité_de_vie.xlsx", sheet = "EPCI", skip = 5)
+garde <- read_xlsx("data/tx_de_couv_epci.xlsx")
+
+# Géographies
+ngeo <- read_xlsx("data/n_geo.xlsx", sheet = "com")
+comepci <- select(ngeo, com2017, epci2018) %>%
+  distinct()
+
+# La suite du script est construite indicateur par indicateur
+
+#######################################################################################
+## FAM_1 ##
+
+fam1 <- select(men, CODGEO, C15_FAMMONO, C15_FAM) %>%
+  left_join(comepci, by = c("CODGEO" = "com2017")) %>%
+  mutate(epci2018 = as.character(epci2018)) %>%
+  select(-CODGEO) %>%
+  group_by(epci2018) %>%
+  summarise_all(sum, na.rm = T) %>%
+  adorn_totals("row") %>%
+  filter(!is.na(epci2018)) %>%
+  mutate(FAM_1 = C15_FAMMONO*100/C15_FAM) %>%
+  select(epci2018, FAM_1)
+
+#######################################################################################
+## FAM_2 ##
+
+fam2 <- pop5 %>%
+  select(-matches('AGEQ65065')) %>%
+  mutate(NBF = rowSums(select(., matches('SEXE2'))), NBH = rowSums(select(., matches('SEXE1')))) %>%
+  mutate(NBF_f = rowSums(select(., matches('SEXE2_........._TACTR24|SEXE2_........._TACTR26'))), NBH_f = rowSums(select(., matches('SEXE1_........._TACTR24|SEXE1_........._TACTR26')))) %>%
+  left_join(comepci, by = c("CODGEO" = "com2017")) %>%
+  mutate(epci2018 = as.character(epci2018)) %>%
+  select(epci2018, NBF, NBH, NBF_f, NBH_f) %>%
+  group_by(epci2018) %>%
+  summarise_all(sum, na.rm = T) %>%
+  adorn_totals("row") %>%
+  gather("INDIC", "VAL", 2:5) %>%
+  mutate(SEXE = ifelse(INDIC %in% c("NBF", "NBF_f"), "F", "H")) %>%
+  mutate(INDIC = ifelse(INDIC %in% c("NBF", "NBH"), "NB", "NB_f")) %>%
+  spread("INDIC", "VAL") %>%
+  filter(!is.na(epci2018)) %>%
+  mutate(FAM_2 = NB_f*100/NB) %>%
+  select(epci2018, SEXE, FAM_2)
+
+#######################################################################################
+## FAM_3 ##
+
+fam3 <- select(men, CODGEO, C15_NE24F3, C15_NE24F4P, C15_FAM) %>%
+  left_join(comepci, by = c("CODGEO" = "com2017")) %>%
+  mutate(epci2018 = as.character(epci2018)) %>%
+  select(-CODGEO) %>%
+  group_by(epci2018) %>%
+  summarise_all(sum, na.rm = T) %>%
+  filter(!is.na(epci2018)) %>%
+  adorn_totals("row") %>%
+  mutate(FAM_3 = (C15_NE24F3+C15_NE24F4P)*100/C15_FAM) %>%
+  select(epci2018, FAM_3)
+
+#######################################################################################
+## FOR_1 ##
+
+# Identification de l'EPCI dans lequel sont scolarisés la majorité des élèves de 1ere
+epcisco <- select(eleves1ere, ELC_IDETAB, COMMRES) %>%
+left_join(select(lycees, numero_uai, commune), by = c("ELC_IDETAB" = "numero_uai")) %>%
+setNames(c("ELC_IDETAB", "COM_RES", "COM_SCO")) %>%
+filter(COM_RES != "\r" & !(is.na(COM_RES)) & COM_SCO != "\r" & !(is.na(COM_SCO))) %>%
+group_by(COM_RES, COM_SCO) %>%
+summarise(EFF = n()) %>%
+# Correction code commune de résidence
+enlever_PLM(codgeo_entree = "COM_RES", agregation = F) %>%
+filter(!(substr(COM_RES, 1, 3) %in% c('977', '978', '975'))) %>%
+filter(!(substr(COM_RES, 1, 2) %in% c('98', '99'))) %>%
+changement_COG_varNum(annees = c(2010:2017), codgeo_entree = "COM_RES", agregation = FALSE) %>%
+# Correction code commune de scolarisation
+enlever_PLM(codgeo_entree = "COM_SCO", agregation = F) %>%
+filter(substr(COM_SCO, 1, 3) != '978') %>%
+changement_COG_varNum(annees = c(2010:2017), codgeo_entree = "COM_SCO", agregation = FALSE) %>%
+# Jointure des EPCI de résidence et de scolarisation
+left_join(comepci, by = c("COM_RES" = "com2017")) %>%
+rename("EPCI_RES" = epci2018) %>%
+left_join(comepci, by = c("COM_SCO" = "com2017")) %>%
+rename("EPCI_SCO" = epci2018) %>%
+mutate(EPCI_RES = as.character(EPCI_RES), EPCI_SCO = as.character(EPCI_SCO)) %>%
+# Identification de l'EPCI où sont scolarisés la majorité des élèves résidents
+group_by(EPCI_RES, EPCI_SCO) %>%
+summarise(EFF = sum(EFF, na.rm = T)) %>%
+group_by(EPCI_RES) %>%
+mutate(sh_eff = EFF*100/sum(EFF, na.rm = T)) %>%
+filter(sh_eff == max(sh_eff)) %>%
+mutate(NB = n()) %>%
+# Attention : 5 EPCI ont leurs effectifs d'élèves de 1ères équirépartis entre plusieurs EPCI de scolarisation. evidemment c'est des EPCI où il n'y a pas de lycées sinon ça serait pas drôle. Décision pour décision, j'en choisis une au pif. 
+mutate(index = row_number()) %>%
+filter(index == 1)
+
+# Calcul de l'indicateur
+for1 <- select(eleves1ere, ELC_COSEXE, ELC_COMEFSTA, ELC_IDETAB) %>%
+  mutate(NOM7 = substr(ELC_COMEFSTA, 1, 7)) %>%
+  mutate(ELC_COSEXE = paste0("SEXE", ELC_COSEXE)) %>%
+  left_join(select(lycees, numero_uai, commune), by = c("ELC_IDETAB" = "numero_uai")) %>%
+  filter(!is.na(commune)) %>%
+  group_by(commune, NOM7, ELC_COSEXE) %>%
+  summarise(EFF = n()) %>%
+  enlever_PLM(codgeo_entree = "commune", agregation = F) %>%
+  filter(substr(commune, 1, 3) != '978') %>%
+  changement_COG_varNum(annees = c(2011:2017),
+                        codgeo_entree = "commune",
+                        agregation = FALSE) %>%
+  left_join(comepci, by = c("commune" = "com2017")) %>%
+  mutate(epci2018 = as.character(epci2018)) %>%
+  ungroup() %>%
+  group_by(epci2018, NOM7, ELC_COSEXE) %>%
+  summarise(EFF = sum(EFF, na.rm = T)) %>%
+  spread(ELC_COSEXE, EFF) %>%
+  mutate_at(vars(matches('SEXE')), funs(ifelse(is.na(.), 0, .))) %>%
+  filter(!is.na(epci2018))
+
+# Récupérer valeurs nationales
+for1nat <- ungroup(for1) %>%
+  select(-epci2018) %>%
+  group_by(NOM7) %>%
+  summarise_all(sum, na.rm = T) %>%
+  mutate(tx_fem = SEXE2*100/(SEXE1+SEXE2)) %>%
+  mutate(MNM = ifelse(tx_fem > 50+15 | tx_fem<50-15, "non mixte", "mixte")) %>%
+  ungroup() %>%
+  group_by(MNM) %>%
+  mutate(EFF_NM = sum(SEXE1) + sum(SEXE2)) %>%
+  ungroup() %>%
+  select(MNM, EFF_NM) %>%
+  distinct() %>%
+  mutate(FOR_1 = EFF_NM*100/sum(EFF_NM)) %>%
+  mutate(epci2018 = "Total") %>%
+  filter(MNM == "non mixte")
+
+for1 <- for1 %>%
+  mutate(tx_fem = SEXE2*100/(SEXE1+SEXE2)) %>%
+  mutate(MNM = ifelse(tx_fem > 50+15 | tx_fem<50-15, "non mixte", "mixte")) %>%
+  ungroup() %>%
+  group_by(epci2018, MNM) %>%
+  mutate(EFF_NM = sum(SEXE1) + sum(SEXE2)) %>%
+  ungroup() %>%
+  select(epci2018, MNM, EFF_NM) %>%
+  distinct() %>%
+  group_by(epci2018) %>%
+  mutate(FOR_1 = EFF_NM*100/sum(EFF_NM)) %>%
+  mutate(nb = n()) %>%
+  filter((MNM == "non mixte" & nb == 2) | nb == 1) %>%
+  mutate(FOR_1 = ifelse(MNM == "mixte", 0, FOR_1)) %>%
+  select(-nb)
+
+# Ajout des EPCI sans lycées
+temp <- select(epcisco, EPCI_RES, EPCI_SCO) %>%
+  filter(!(EPCI_RES %in% for1$epci2018)) %>%
+  left_join(for1, by = c("EPCI_SCO" = "epci2018")) %>%
+  rename("epci2018" = EPCI_RES) %>%
+  select(-EPCI_SCO)
+
+for1 <- bind_rows(for1, temp) %>%
+  bind_rows(for1nat) %>%
+  select(epci2018, FOR_1)
+
+#######################################################################################
+## FOR_2 ##
+
+for2 <- form %>%
+  mutate(EffF = rowSums(select(., matches('SEXE2')), na.rm = T)) %>%
+  mutate(FND = rowSums(select(., matches('DIPL_15A_SEXE2|DIPL_15B_SEXE2')))) %>%
+  left_join(comepci, by = c("CODGEO" = "com2017")) %>%
+  mutate(epci2018 = as.character(epci2018)) %>%
+  select(epci2018, EffF, FND) %>%
+  group_by(epci2018) %>%
+  summarise_all(sum, na.rm = T) %>%
+  filter(!is.na(epci2018)) %>%
+  adorn_totals("row") %>%
+  mutate(FOR_2 = FND*100/EffF) %>%
+  select(epci2018, FOR_2)
+
+#######################################################################################
+## FOR_3 ##
+
+for3 <- act2 %>%
+  select(CODGEO, matches('AGEQ65015|AGEQ65020')) %>%
+  mutate(F1524 = rowSums(select(., matches('SEXE2_AGEQ65015|SEXE2_AGEQ65020'))), H1524 = rowSums(select(., matches('SEXE1_AGEQ65015|SEXE1_AGEQ65020')))) %>%
+  mutate(FNEET = rowSums(select(., matches('SEXE2_........._TACTR12|SEXE2_........._TACTR21|SEXE2_........._TACTR24|SEXE2_........._TACTR26'))), HNEET = rowSums(select(., matches('SEXE1_........._TACTR12|SEXE1_........._TACTR21|SEXE1_........._TACTR24|SEXE1_........._TACTR26')))) %>%
+  left_join(comepci, by = c("CODGEO" = "com2017")) %>%
+  mutate(epci2018 = as.character(epci2018)) %>%
+  select(epci2018, F1524, H1524, FNEET, HNEET) %>%
+  group_by(epci2018) %>%
+  summarise_all(sum, na.rm = T) %>%
+  adorn_totals("row") %>%
+  gather("INDIC", "VAL", 2:5) %>%
+  mutate(SEXE = ifelse(INDIC %in% c("F1524", "FNEET"), "F", "H")) %>%
+  mutate(INDIC = ifelse(INDIC %in% c("F1524", "H1524"), "NB1524", "NEET")) %>%
+  spread("INDIC", "VAL") %>%
+  filter(!is.na(epci2018)) %>%
+  mutate(FOR_3 = NEET*100/NB1524) %>%
+  select(epci2018, SEXE, FOR_3)
+
+#######################################################################################
+## EMP_1 ##
+
+emp1 <- chom %>%
+  mutate(CHOMF = rowSums(select(., matches('SEXE2_........._TACTR_212'))), CHOMH = rowSums(select(., matches('SEXE1_........._TACTR_212')))) %>%
+  mutate(FACT = rowSums(select(., matches('SEXE2'))), HACT = rowSums(select(., matches('SEXE1')))) %>%
+  left_join(comepci, by = c("CODGEO" = "com2017")) %>%
+  mutate(epci2018 = as.character(epci2018)) %>%
+  select(epci2018, CHOMF, CHOMH, FACT, HACT) %>%
+  group_by(epci2018) %>%
+  summarise_all(sum, na.rm = T) %>%
+  adorn_totals("row") %>%
+  gather("INDIC", "VAL", 2:5) %>%
+  mutate(SEXE = ifelse(INDIC %in% c("CHOMF", "FACT"), "F", "H")) %>%
+  mutate(INDIC = ifelse(INDIC %in% c("FACT", "HACT"), "ACT", "CHOM")) %>%
+  spread("INDIC", "VAL") %>%
+  filter(!is.na(epci2018)) %>%
+  mutate(EMP_1 = CHOM*100/ACT) %>%
+  select(epci2018, SEXE, EMP_1)
+
+#######################################################################################
+## EMP_2 ##
+
+emp2 <- empcsp1 %>%
+  select(-LIBGEO) %>%
+  full_join(select(empcsp2, -LIBGEO), by = "CODGEO") %>%
+  gather("Indic", "Valeur", 2:291) %>%
+  mutate(Sexe = substr(Indic, 16, 20)) %>%
+  mutate(CSP = substr(Indic, 7, 8)) %>%
+  select(-Indic) %>%
+  left_join(comepci, by = c("CODGEO" = "com2017")) %>%
+  mutate(epci2018 = as.character(epci2018)) %>%
+  group_by(epci2018, Sexe, CSP) %>%
+  summarise(Eff = sum(Valeur, na.rm = T)) %>%
+  spread(Sexe, Eff) %>%
+  filter(!is.na(epci2018))
+
+# Récupérer valeurs nationales
+emp2nat <- ungroup(emp2) %>%
+  select(-epci2018) %>%
+  group_by(CSP) %>%
+  summarise_all(sum, na.rm = T) %>%
+  mutate(tx_fem = SEXE2*100/(SEXE1+SEXE2)) %>%
+  mutate(MNM = ifelse(tx_fem > 48+15 | tx_fem<48-15, "non mixte", "mixte")) %>%
+  group_by(MNM) %>%
+  mutate(EFF_NM = sum(SEXE1) + sum(SEXE2)) %>%
+  ungroup() %>%
+  select(MNM, EFF_NM) %>%
+  distinct() %>%
+  mutate(EMP_2 = EFF_NM*100/sum(EFF_NM)) %>%
+  filter(MNM == "non mixte") %>%
+  mutate(epci2018 = "Total") %>%
+  select(epci2018, EMP_2)
+
+emp2 <- emp2 %>%
+  mutate(tx_fem = SEXE2*100/(SEXE1+SEXE2)) %>%
+  mutate(MNM = ifelse(tx_fem > 48+15 | tx_fem<48-15, "non mixte", "mixte")) %>%
+  filter(!is.na(MNM)) %>%
+  group_by(epci2018, MNM) %>%
+  mutate(EFF_NM = sum(SEXE1) + sum(SEXE2)) %>%
+  ungroup() %>%
+  select(epci2018, MNM, EFF_NM) %>%
+  distinct() %>%
+  group_by(epci2018) %>%
+  mutate(EMP_2 = EFF_NM*100/sum(EFF_NM)) %>%
+  filter(MNM == "non mixte") %>%
+  select(epci2018, EMP_2) %>%
+  bind_rows(emp2nat)
+
+#######################################################################################
+## EMP_3 ##  
+
+emp3 <- empcond %>%
+  mutate(TpsPF = rowSums(select(., matches('SEXE2_TP2'))), TpsPH = rowSums(select(., matches('SEXE1_TP2')))) %>%
+  mutate(EmpF = rowSums(select(., matches('SEXE2'))), EmpH = rowSums(select(., matches('SEXE1')))) %>%
+  left_join(comepci, by = c("CODGEO" = "com2017")) %>%
+  mutate(epci2018 = as.character(epci2018)) %>%
+  select(epci2018, TpsPF, TpsPH, EmpF, EmpH) %>%
+  group_by(epci2018) %>%
+  summarise_all(sum, na.rm = T) %>%
+  adorn_totals("row") %>%
+  gather("INDIC", "VAL", 2:5) %>%
+  mutate(SEXE = ifelse(INDIC %in% c("TpsPF", "EmpF"), "F", "H")) %>%
+  mutate(INDIC = ifelse(INDIC %in% c("EmpF", "EmpH"), "EMP", "TPSP")) %>%
+  spread("INDIC", "VAL") %>%
+  filter(!is.na(epci2018)) %>%
+  mutate(EMP_3 = TPSP*100/EMP) %>%
+  select(epci2018, SEXE, EMP_3)
+
+#######################################################################################
+## EMP_4 ##  
+
+emp4 <- empcond %>%
+  mutate(PrecF = rowSums(select(., matches('EMPL11_SEXE2|EMPL12_SEXE2|EMPL13_SEXE2|EMPL14_SEXE2|EMPL15_SEXE2'))), PrecH = rowSums(select(., matches('EMPL11_SEXE1|EMPL12_SEXE1|EMPL13_SEXE1|EMPL14_SEXE1|EMPL15_SEXE1')))) %>%
+  mutate(EmpF = rowSums(select(., matches('EMPL11_SEXE2|EMPL12_SEXE2|EMPL13_SEXE2|EMPL14_SEXE2|EMPL15_SEXE2|EMPL16_SEXE2'))), EmpH = rowSums(select(., matches('EMPL11_SEXE1|EMPL12_SEXE1|EMPL13_SEXE1|EMPL14_SEXE1|EMPL15_SEXE1|EMPL16_SEXE1')))) %>%
+  left_join(comepci, by = c("CODGEO" = "com2017")) %>%
+  mutate(epci2018 = as.character(epci2018)) %>%
+  select(epci2018, PrecF, PrecH, EmpF, EmpH) %>%
+  group_by(epci2018) %>%
+  summarise_all(sum, na.rm = T) %>%
+  adorn_totals("row") %>%
+  gather("INDIC", "VAL", 2:5) %>%
+  mutate(SEXE = ifelse(INDIC %in% c("PrecF", "EmpF"), "F", "H")) %>%
+  mutate(INDIC = ifelse(INDIC %in% c("EmpF", "EmpH"), "EMP", "PREC")) %>%
+  spread("INDIC", "VAL") %>%
+  filter(!is.na(epci2018)) %>%
+  mutate(EMP_4 = PREC*100/EMP) %>%
+  select(epci2018, SEXE, EMP_4)
+
+#######################################################################################
+## EQU_1 ##
+
+#######################################################################################
+## EQU_2 ##
+
+equ2 <- select(sco, COMMUNE, DCETUF, IPONDI) %>%
+  mutate_if(is.factor, as.character) %>%
+  enlever_PLM(codgeo_entree = "DCETUF", agregation = F) %>%
+  mutate(SCOHCOMRES = ifelse(COMMUNE != DCETUF, IPONDI, 0)) %>%
+  select(-DCETUF) %>%
+  left_join(comepci, by = c("COMMUNE" = "com2017")) %>%
+  mutate(epci2018 = as.character(epci2018)) %>%
+  group_by(epci2018) %>%
+  summarise(SCOHCOMRES = sum(SCOHCOMRES, na.rm = T), IPONDI = sum(IPONDI, na.rm = T)) %>%
+  filter(!is.na(epci2018)) %>%
+  adorn_totals("row") %>%
+  mutate(EQU_2 = SCOHCOMRES*100/IPONDI) %>%
+  select(epci2018, EQU_2)
+  
+
+#######################################################################################
+## EQU_3 ##
+
+equ3 <- domtrav %>%
+  select("epci2018" = epci, "EQU_3" = mediane)
+
+#######################################################################################
+## EQU_4 ##
+
+# equ4 <- accequ %>%
+#   select("epci2018" = EPCI2018, "EQU_4" = I0102_Inter_Rec) %>%
+#   mutate(EQU_4 = ifelse(EQU_4 == -9999999, NA, EQU_4)) %>%
+#   mutate(EQU_4 = 100 - EQU_4) %>%
+#   bind_rows(data.frame("epci2018" =  "Total", "EQU_4" = 100-94.2))
+
+#######################################################################################
+## EQU_1 ##
+
+equ1 <- garde %>%
+  select("epci2018" = epci, "EQU_1" = txmean) %>%
+  mutate(EQU_1 = 100 - EQU_1) %>%
+  bind_rows(data.frame("epci2018" = "Total", "EQU_1" = 100-56.6)) # Source des 56,6 : http://www.caf.fr/sites/default/files/cnaf/Documents/Dser/observatoire_petite_enfance/aje_2016.pdf, page 24
+
+#######################################################################################
+#######################################################################################
+## JOINTURE ET EXPORT ##
+
+# Tableau général femmes (pour typo)
+datajoin <- full_join(fam1, filter(fam2, SEXE == 'F') %>% select(-SEXE), by = "epci2018") %>%
+  left_join(fam3, by= "epci2018") %>%
+  left_join(for1, by = "epci2018") %>%
+  left_join(for2, by = "epci2018") %>%
+  left_join(filter(for3, SEXE == 'F') %>% select(-SEXE), by = "epci2018") %>%
+  left_join(filter(emp1, SEXE == 'F') %>% select(-SEXE), by = "epci2018") %>%
+  left_join(emp2, by = "epci2018") %>%
+  left_join(filter(emp3, SEXE == 'F') %>% select(-SEXE), by = "epci2018") %>%
+  left_join(filter(emp4, SEXE == 'F') %>% select(-SEXE), by = "epci2018") %>%
+  left_join(equ2, by = "epci2018") %>%
+  left_join(equ3, by = "epci2018") %>%
+  left_join(equ1, by = "epci2018")
+
+write.csv2(datajoin, "data/data_epci.csv", row.names = F)
+
+# Tableau accès à l'emploi femmes + hommes (pour graphique 1)
+dataAE <- full_join(fam2, for3, by = c("epci2018", "SEXE")) %>%
+  full_join(emp1, by = c("epci2018", "SEXE")) %>%
+  full_join(emp3, by = c("epci2018", "SEXE")) %>%
+  full_join(emp4, by = c("epci2018", "SEXE"))
+
+write.csv2(dataAE, "data/dataAE.csv", row.names = F)
+
+# Tableau accès à l'emploi NAT femmes + hommes (pour graphique 1)
+dataAEfr <- filter(dataAE, epci2018 == 'Total') %>%
+  gather("Indic", "valeur_france", 3:7) %>%
+  select(-epci2018)
+
+write.csv2(dataAEfr, "data/dataAE_fr.csv", row.names = F)
+
+# Tableau freins / leviers (pour graphique 2)
+dataFL <- select(datajoin, epci2018, matches('FAM_1|FAM_3|EMP_2|FOR_1|FOR_2|EQU_3|EQU_2|EQU_1'))
+
+write.csv2(dataFL, "data/dataFL.csv", row.names = F)
+
+# Tableau freins / leviers NAT (pour graphique 2)
+dataFLfr <- filter(dataFL, epci2018 == 'Total') %>%
+  gather("Indic", "valeur_france", 2:9) %>%
+  select(-epci2018)
+
+write.csv2(dataFLfr, "data/dataFL_fr.csv", row.names = F)
+
+#######################################################################################
+#######################################################################################
+## CONVERSION EN BASE 100 ET EXPORT ##
+# datajoin <- read.csv2("data/data_epci.csv")
+
+## GR 1
+# Conversion en base 100 ACCES A L'EMPLOI
+dataepci100AE <- data.frame(dataAE)
+
+for(indic in colnames(dataepci100AE[3:7])){
+  newindic <- paste0(indic, "_b100")
+  dataepci100AE[[newindic]] <- numeric(nrow(dataepci100AE))
+  for(epci in dataepci100AE$epci2018){
+    dataepci100AE[dataepci100AE$epci2018 == epci, newindic] <- dataepci100AE[dataepci100AE$epci2018 == epci, indic]*100/dataepci100AE[dataepci100AE$epci2018 == "Total" & dataepci100AE$SEXE == "F", indic]
+    }
+}
+
+dataepci100AE <- select(dataepci100AE, epci2018, SEXE, matches('_b100'))
+
+# Export
+write.csv2(dataepci100AE, "data/dataAE_b100.csv", row.names = F)
+
+## GR 2
+# Conversion en base 100 FREINS / LEVIERS
+dataepci100FL <- data.frame(dataFL)
+
+for(indic in colnames(dataepci100FL[2:9])){
+  newindic <- paste0(indic, "_b100")
+  dataepci100FL[[newindic]] <- numeric(nrow(dataepci100FL))
+  for(epci in dataepci100FL$epci2018){
+    dataepci100FL[dataepci100FL$epci2018 == epci, newindic] <- dataepci100FL[dataepci100FL$epci2018 == epci, indic]*100/dataepci100FL[dataepci100FL$epci2018 == "Total", indic]
+  }
+}
+
+dataepci100FL <- select(dataepci100FL, epci2018, matches('_b100'))
+
+# Export
+write.csv2(dataepci100FL, "data/dataFL_b100.csv", row.names = F)

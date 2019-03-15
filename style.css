@@ -75,6 +75,7 @@ a:hover{
 }
 
 button#go{
+	font-family : 'Bree Serif' ;
 	background-color : #ff715b ;
 	bottom : 0 ;
 	margin-top : 20px ;
@@ -84,6 +85,16 @@ button#go{
 	float : right ;
 	font-size : 1.5em ; 
 	font-style : bold ;
+}
+
+#logoPanel{
+	background-color : #F9F9F9;
+	padding : 5px ;
+}
+
+.logo{
+	float : right ;
+	margin-left : 20px ;
 }
 
 /* BANDEAU TITRE */
@@ -154,7 +165,7 @@ h1{
 /* CARTE */
 #map.leaflet-container{
 	background-color : rgba(0,0,0,0);
-	height : calc(100vh - 270px) !important;
+	height : calc(98vh - 270px) !important;
 	width : 100% ;
 }
 
@@ -194,13 +205,13 @@ h1{
 
 
 #fdf1{
-	background-color : #63a375;
+	background-color : #cfc133;
 	color : white ;
 	font-family : 'Ubuntu', sans-serif ;
 }
 
 #fdf2{
-	background-color : #a64253;
+	background-color : #e86752;
 	color : white ;
 	font-family : 'Ubuntu', sans-serif ;
 }
@@ -228,7 +239,6 @@ h1{
 	margin-top : 5vh ;
 	margin-bottom : 10vh ;
 	height : 85vh ;
-	z-index : -1 ;
 	background: repeating-linear-gradient(
 	  -45deg,
 	  #ececec,
@@ -245,6 +255,9 @@ h1{
 	text-align : justify ;
 	color : #333232;
 	font-family : 'Ubuntu', sans-serif ;
+	height : 65vh ;
+	overflow : auto ;
+	z-index : 101 ;
 }
 
 .tttxt{
@@ -256,8 +269,16 @@ h1{
 .panarr{
 	width : 100px ;
 	left : 44.2vw ;
-	margin-top : 95vh ;
+	margin-top : 92vh ;
 	z-index : 100 ;
+}
+
+.panarrtxt{
+	margin-left : -3vw ;
+	text-align : center ;
+	font-style : italic ;
+	font-weight : bold ;
+	color : #333232 ;
 }
 
 .arrow{
@@ -290,4 +311,71 @@ h1{
 
 #dir1{
 	margin-right : 10px ;
+}
+
+/* ONGLET INDICATEURS */
+#navigIndic .col-sm-4.well{
+	width : 15% ;
+	background-color : rgba(0,0,0,0) ;
+	border : 0 ;
+	box-shadow : none ;
+}
+
+#navigIndic .col-sm-8{
+	width : 85% ;
+}
+
+div.col-sm-4.well a{
+	font-size : 1em ;
+	color : #333232;
+	font-family : 'Ubuntu', sans-serif;
+	font-weight : normal ;
+	line-height : 1em ;
+}
+
+#navIndic.nav.nav-pills.nav-stacked.shiny-tab-input.shiny-bound-input li a:hover, #navIndic.nav.nav-pills.nav-stacked.shiny-tab-input.shiny-bound-input li a:focus, #navIndic.nav.nav-pills.nav-stacked.shiny-tab-input.shiny-bound-input li.active a{
+	font-size : 1em ;
+	font-family : 'Ubuntu', sans-serif;
+	color : #6e2150 ;
+	background-color : #caaebf ;
+	font-weight : normal ;
+}
+
+.srcindic, .uniteindic{
+	font-style : italic ;
+	font-size : 0.8em ;
+	color : #8f8f8f ;
+	line-height : 0.8em ;
+}
+
+.descindic{
+	font-size : 1em ; 
+	color : #333232;
+	text-align : justify ;
+}
+
+/* ONGLET INFOS */
+.ssttinfo, .ttindic{
+	font-family : 'Ubuntu', sans-serif;
+	color : #333232;
+	font-size : 1.2em ;
+	font-weight : bold ;
+}
+
+.bloc, #doc{
+	text-align : justify ;
+	font-family : 'Ubuntu', sans-serif;
+	color : #333232;
+}
+
+.bloc a, #doc a{
+	font-family : 'Ubuntu', sans-serif;
+	font-size : 1em ;
+	color : #333232;
+	text-decoration : underline ;
+	font-weight : normal ;
+}
+
+#doc li{
+	margin: 0 0 10px 0;
 }

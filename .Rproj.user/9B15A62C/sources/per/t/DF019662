@@ -1,0 +1,23 @@
+{
+    "collab_server" : "",
+    "contents" : "",
+    "created" : 1552483641713.000,
+    "dirty" : true,
+    "encoding" : "UTF-8",
+    "folds" : "",
+    "hash" : "3457279613",
+    "id" : "DF019662",
+    "lastKnownWriteTime" : 1551778642,
+    "last_content_update" : 1552484245263,
+    "path" : "N:/DST/SDOAS/BOT/Dossiers internes/Dossier égalité hommes femmes/App diagnostic emploi femmes/DiagEmploiFemmes/mef_data.R",
+    "project_path" : "mef_data.R",
+    "properties" : {
+        "cursorPosition" : "13,24",
+        "scrollLine" : "8",
+        "tempName" : "Untitled1"
+    },
+    "relative_order" : 1,
+    "source_on_save" : false,
+    "source_window" : "",
+    "type" : "r_source"
+}

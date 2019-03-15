@@ -1,0 +1,15 @@
+"0","txfem <- select(eleves1ere, ELC_COSEXE, ELC_COMEFSTA) %>%"
+"0","  mutate(NOM7 = substr(ELC_COMEFSTA, 1, 7)) %>%"
+"0","  group_by(ELC_COSEXE, NOM7) %>%"
+"0","  summarise(EFF = n()) %>%"
+"0","  ungroup() %>%"
+"0","  group_by(NOM7) %>%"
+"0","  mutate(sh_fem = EFF*100/sum(EFF)) %>%"
+"0","  filter(ELC_COSEXE == 2) %>%"
+"0","  left_join(select(formations, MEF_STAT_7, LIBELLE_LONG), by = c(""NOM7"" = ""MEF_STAT_7"")) %>%"
+"0","  select(""Code"" = NOM7, ""Formation"" = LIBELLE_LONG, ""Taux de féminisation"" = sh_fem) %>%"
+"0","  arrange(desc(`Taux de féminisation`))"
+"0","kable(txfem)"
+"2","Error in system(command) : 
+  invalid input 'C:\PROGRA~1\RStudio\bin\pandoc\pandoc.exe +RTS -K512m -RTS ""C:\Users\clecomte\AppData\Local\Temp\Rtmpo9yljP\_rs_md_264c34175f83.md"" --to html4 --output ""N:\DST\SDOAS\BOT\Dossiers internes\Dossier égalité hommes femmes\App diagnostic emploi femmes\DiagEmploiFemmes\.Rproj.user\shared\notebooks\26FEC5DB-recherchesIndicSegreg2\1\s\caz6sxyoprmg5_t\_rs_html_264c5d2429c6.html""' in 'utf8towcs'
+"

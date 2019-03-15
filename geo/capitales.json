@@ -1,0 +1,23 @@
+{
+"type": "FeatureCollection",
+"name": "capitales",
+"features": [
+{ "type": "Feature", "properties": { "CODGEO": "76540", "LIBGEO": "ROUEN" }, "geometry": { "type": "Point", "coordinates": [ 1.102513809635984, 49.44303275406677 ] } },
+{ "type": "Feature", "properties": { "CODGEO": "31555", "LIBGEO": "TOULOUSE" }, "geometry": { "type": "Point", "coordinates": [ 1.441995070842509, 43.604344673905644 ] } },
+{ "type": "Feature", "properties": { "CODGEO": "59350", "LIBGEO": "LILLE" }, "geometry": { "type": "Point", "coordinates": [ 3.057498620042848, 50.631949731932359 ] } },
+{ "type": "Feature", "properties": { "CODGEO": "97209", "LIBGEO": "FORT-DE-FRANCE" }, "geometry": { "type": "Point", "coordinates": [ -3.728749004730206, 44.009486020711741 ] } },
+{ "type": "Feature", "properties": { "CODGEO": "35238", "LIBGEO": "RENNES" }, "geometry": { "type": "Point", "coordinates": [ -1.680729172942389, 48.114294181834538 ] } },
+{ "type": "Feature", "properties": { "CODGEO": "13055", "LIBGEO": "MARSEILLE" }, "geometry": { "type": "Point", "coordinates": [ 5.382923951177244, 43.298693043790905 ] } },
+{ "type": "Feature", "properties": { "CODGEO": "97302", "LIBGEO": "CAYENNE" }, "geometry": { "type": "Point", "coordinates": [ -2.346199228999573, 42.996503796922703 ] } },
+{ "type": "Feature", "properties": { "CODGEO": "75056", "LIBGEO": "PARIS" }, "geometry": { "type": "Point", "coordinates": [ 2.341388853408767, 48.860055113008926 ] } },
+{ "type": "Feature", "properties": { "CODGEO": "67482", "LIBGEO": "STRASBOURG" }, "geometry": { "type": "Point", "coordinates": [ 7.752286500860818, 48.57331461657617 ] } },
+{ "type": "Feature", "properties": { "CODGEO": "21231", "LIBGEO": "DIJON" }, "geometry": { "type": "Point", "coordinates": [ 5.041980231385232, 47.322977984221602 ] } },
+{ "type": "Feature", "properties": { "CODGEO": "97411", "LIBGEO": "SAINT-DENIS" }, "geometry": { "type": "Point", "coordinates": [ -2.474917224024073, 44.89180968006967 ] } },
+{ "type": "Feature", "properties": { "CODGEO": "45234", "LIBGEO": "ORLEANS" }, "geometry": { "type": "Point", "coordinates": [ 1.904046142880122, 47.90219517742598 ] } },
+{ "type": "Feature", "properties": { "CODGEO": "97105", "LIBGEO": "BASSE-TERRE" }, "geometry": { "type": "Point", "coordinates": [ -4.425973082037994, 45.052815400672756 ] } },
+{ "type": "Feature", "properties": { "CODGEO": "33063", "LIBGEO": "BORDEAUX" }, "geometry": { "type": "Point", "coordinates": [ -0.579507702512153, 44.837750901037658 ] } },
+{ "type": "Feature", "properties": { "CODGEO": "2A004", "LIBGEO": "AJACCIO" }, "geometry": { "type": "Point", "coordinates": [ 8.736308585597412, 41.92558214222727 ] } },
+{ "type": "Feature", "properties": { "CODGEO": "69123", "LIBGEO": "LYON" }, "geometry": { "type": "Point", "coordinates": [ 4.830147124494905, 45.769509326594481 ] } },
+{ "type": "Feature", "properties": { "CODGEO": "44109", "LIBGEO": "NANTES" }, "geometry": { "type": "Point", "coordinates": [ -1.553912565469664, 47.217277601687094 ] } }
+]
+}
